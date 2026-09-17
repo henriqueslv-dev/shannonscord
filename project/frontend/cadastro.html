@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ShannonsCord - Login</title>
+    <title>ShannonsCord - Cadastro</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,9 +23,25 @@
 
             <h1 class="logo">ShannonsCord</h1>
 
-            <p class="subtitle">Entre na sua conta</p>
+            <p class="subtitle">Crie sua conta</p>
 
             <form class="login-form">
+
+                <label class="form-label" for="nome">Nome</label>
+                <input
+                    class="form-input"
+                    type="text"
+                    id="nome"
+                    placeholder="Digite seu nome"
+                >
+
+                <label class="form-label" for="username">Username</label>
+                <input
+                    class="form-input"
+                    type="text"
+                    id="username"
+                    placeholder="Escolha seu username"
+                >
 
                 <label class="form-label" for="email">Email</label>
                 <input
@@ -40,19 +56,30 @@
                     class="form-input"
                     type="password"
                     id="senha"
-                    placeholder="Digite sua senha"
+                    placeholder="Crie uma senha"
+                >
+
+                <label class="form-label" for="confirmar-senha">
+                    Confirmar senha
+                </label>
+
+                <input
+                    class="form-input"
+                    type="password"
+                    id="confirmar-senha"
+                    placeholder="Confirme sua senha"
                 >
 
                 <button class="form-button" type="submit">
-                    Entrar
+                    Criar conta
                 </button>
 
             </form>
 
             <p class="register-text">
-                Ainda não tem uma conta?
-                <a class="register-link" href="cadastro.html">
-                    Criar conta
+                Já possui uma conta?
+                <a class="register-link" href="index.html">
+                    Entrar
                 </a>
             </p>
 

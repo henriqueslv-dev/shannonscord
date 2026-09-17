@@ -1,0 +1,413 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+}
+
+
+/* =========================
+LOGIN E CADASTRO
+========================= */
+
+.login-container {
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-box {
+    width: 350px;
+    padding: 30px;
+
+    background: #1e1e1e;
+    border-radius: 10px;
+}
+
+.logo {
+    text-align: center;
+    color: #4caf50;
+    margin-bottom: 10px;
+
+    font-family: "Titan One", sans-serif;
+}
+
+.subtitle {
+    text-align: center;
+    color: #aaa;
+    margin-bottom: 25px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    margin-bottom: 5px;
+}
+
+.form-input {
+    padding: 12px;
+    margin-bottom: 15px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: #333;
+    color: white;
+}
+
+.form-button {
+    padding: 12px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: #4caf50;
+    color: white;
+
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.form-button:hover {
+    background: #45a049;
+}
+
+.register-text {
+    margin-top: 20px;
+
+    text-align: center;
+    font-size: 14px;
+
+    color: #aaa;
+}
+
+.register-link {
+    color: #4caf50;
+    text-decoration: none;
+}
+
+
+/* =========================
+   HOME
+========================= */
+
+.home-container {
+    height: 100vh;
+
+    display: grid;
+
+    grid-template-columns: 70px 240px 1fr 220px;
+}
+
+
+/* SERVIDORES */
+
+.servers {
+    background: #111;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding-top: 15px;
+    gap: 10px;
+}
+
+.server-logo,
+.server {
+    width: 50px;
+    height: 50px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 15px;
+
+    background: #222;
+
+    cursor: pointer;
+
+    font-size: 20px;
+}
+
+.server-logo {
+    background: #4caf50;
+
+    font-family: "Titan One", sans-serif;
+}
+
+
+/* CANAIS */
+
+.channels {
+    background: #1e1e1e;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.channels-header {
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 15px;
+
+    border-bottom: 1px solid #333;
+}
+
+.channels-header h2 {
+    font-size: 18px;
+}
+
+.channels-list {
+    padding: 15px;
+    flex: 1;
+}
+
+.channel-title {
+    margin: 10px 0;
+
+    font-size: 12px;
+    color: #888;
+}
+
+.channel {
+    display: block;
+
+    padding: 8px;
+
+    color: #aaa;
+
+    text-decoration: none;
+
+    border-radius: 5px;
+}
+
+.channel:hover {
+    background: #333;
+    color: white;
+}
+
+
+/* USUARIO */
+
+.user-area {
+    height: 65px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px;
+
+    background: #181818;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-avatar {
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 50%;
+
+    background: #4caf50;
+}
+
+.username {
+    font-size: 14px;
+}
+
+.user-status {
+    font-size: 11px;
+    color: #4caf50;
+}
+
+.user-button {
+    border: none;
+
+    background: none;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+
+/* CHAT */
+
+.chat {
+    background: #151515;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 20px;
+
+    border-bottom: 1px solid #333;
+}
+
+.chat-header h2 {
+    font-size: 18px;
+}
+
+.messages {
+    flex: 1;
+
+    padding: 20px;
+
+    overflow-y: auto;
+}
+
+.message {
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 50%;
+
+    background: #4caf50;
+}
+
+.message-content {
+    flex: 1;
+}
+
+.message-info {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 4px;
+}
+
+.message-info span {
+    font-size: 11px;
+    color: #777;
+}
+
+.message-content p {
+    color: #ccc;
+}
+
+
+/* CAMPO DE MENSAGEM */
+
+.message-form {
+    display: flex;
+
+    gap: 10px;
+
+    padding: 15px;
+}
+
+.message-input {
+    flex: 1;
+
+    padding: 12px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: #292929;
+
+    color: white;
+}
+
+.message-button {
+    padding: 12px 18px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: #4caf50;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+
+/* MEMBROS */
+
+.members {
+    background: #1e1e1e;
+
+    padding: 20px;
+}
+
+.members h3 {
+    margin-bottom: 20px;
+
+    font-size: 12px;
+
+    color: #888;
+}
+
+.member {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+
+    color: #ccc;
+}
+
+.member-avatar {
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 50%;
+
+    background: #4caf50;
+}
+
