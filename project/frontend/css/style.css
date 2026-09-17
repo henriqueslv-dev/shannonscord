@@ -148,6 +148,13 @@ LOGIN E CADASTRO
     font-family: "Titan One", sans-serif;
 }
 
+#server-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
 
 /* CANAIS */
 
@@ -443,4 +450,248 @@ LOGIN E CADASTRO
 .notification-message {
     font-size: 14px;
     color: #bbb;
+}
+
+/* ==========================
+   CRIAR GRUPO
+   ========================== */
+
+.server-create {
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: white;
+}
+
+.server-create:hover {
+    background: #4caf50;
+    color: #111;
+}
+
+
+/* MODAL */
+
+.group-modal {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.7);
+
+    z-index: 999;
+}
+
+.group-modal.show {
+    display: flex;
+}
+
+
+/* CAIXA */
+
+.group-modal-box {
+    width: 400px;
+
+    padding: 25px;
+
+    background: #1f1f1f;
+
+    border-radius: 10px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.group-modal-box h2 {
+    margin-bottom: 8px;
+    color: white;
+}
+
+.group-modal-box p {
+    margin-bottom: 20px;
+    color: #aaa;
+}
+
+
+/* INPUT */
+
+.group-input {
+    width: 100%;
+
+    padding: 12px;
+
+    box-sizing: border-box;
+
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 6px;
+
+    color: white;
+
+    outline: none;
+}
+
+.group-input:focus {
+    border-color: #81e0ff;
+}
+
+
+/* BOTÕES */
+
+.group-buttons {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+.group-cancel,
+.group-create {
+    padding: 10px 15px;
+
+    border: none;
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+.group-cancel {
+    background: #333;
+    color: white;
+}
+
+.group-create {
+    background: #81e0ff;
+    color: #111;
+}
+
+.group-cancel:hover,
+.group-create:hover {
+    opacity: 0.85;
+}
+
+.server-selected {
+    background: #81e0ff;
+    color: #111;
+}
+
+.channel-category {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.channel-category span {
+    font-size: 12px;
+    color: #888;
+    font-weight: bold;
+}
+
+.channel-category button {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.channel-category button:hover {
+    color: white;
+}
+
+.channel {
+    display: block;
+    padding: 8px;
+    color: #aaa;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.channel:hover {
+    background: #2a2a2a;
+    color: white;
+}
+
+.channel-selected {
+    background: #333;
+    color: white;
+}
+
+.channel-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+.channel-modal.show {
+    display: flex;
+}
+
+.channel-modal-box {
+    width: 400px;
+    padding: 25px;
+    background: #1f1f1f;
+    border-radius: 10px;
+}
+
+.channel-modal-box h2 {
+    color: white;
+    margin-bottom: 8px;
+}
+
+.channel-modal-box p {
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+.channel-input {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: white;
+    outline: none;
+}
+
+.channel-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.channel-buttons button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#channel-cancel {
+    background: #333;
+    color: white;
+}
+
+#channel-create {
+    background: #81e0ff;
+    color: #111;
 }
