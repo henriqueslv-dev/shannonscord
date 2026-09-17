@@ -411,3 +411,36 @@ LOGIN E CADASTRO
     background: #4caf50;
 }
 
+/* NOTIFICAÇÃO */
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #1f1f1f;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+
+    opacity: 0;
+    transform: translateX(120%);
+    transition: 0.3s;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.notification-message {
+    font-size: 14px;
+    color: #bbb;
+}
