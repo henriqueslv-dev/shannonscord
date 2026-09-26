@@ -314,12 +314,109 @@ const channelCreate =
 const channelList =
     document.querySelector("#channel-list");
 
+const membersTitle =
+    document.querySelector("#members-title");
+
+const membersList =
+    document.querySelector("#members-list");
+
 
 // ==========================
 // CANAL ATUAL
 // ==========================
 
 let canalAtual = "geral";
+
+
+// ==========================
+// MEMBROS DO CANAL
+// ==========================
+
+function obterMembrosDoCanal(grupoNome, canalNome) {
+
+    const membrosPorCanal =
+        JSON.parse(localStorage.getItem("membrosDoCanal")) || {};
+
+    const chave = grupoNome + "_" + canalNome;
+    const todasMensagens =
+        JSON.parse(localStorage.getItem("mensagens")) || {};
+
+    const autoresDasMensagens =
+        (todasMensagens[chave] || [])
+            .map((mensagem) => mensagem.nome)
+            .filter(Boolean);
+
+    return [...new Set([
+        ...(membrosPorCanal[chave] || []),
+        ...autoresDasMensagens
+    ])];
+}
+
+function registrarMembroNoCanal(nome, grupoNome, canalNome) {
+
+    if (!nome || !grupoNome || !canalNome) {
+        return;
+    }
+
+    const membrosPorCanal =
+        JSON.parse(localStorage.getItem("membrosDoCanal")) || {};
+
+    const chave = grupoNome + "_" + canalNome;
+    const membros = membrosPorCanal[chave] || [];
+
+    if (!membros.includes(nome)) {
+        membros.push(nome);
+        membrosPorCanal[chave] = membros;
+
+        localStorage.setItem(
+            "membrosDoCanal",
+            JSON.stringify(membrosPorCanal)
+        );
+    }
+}
+
+function atualizarMembrosDoCanal() {
+
+    if (!membersTitle || !membersList) {
+        return;
+    }
+
+    const grupoNome = localStorage.getItem("grupoAtual");
+
+    if (!grupoNome) {
+        membersTitle.textContent = "MEMBROS - 0";
+        membersList.innerHTML = "";
+        return;
+    }
+
+    const usuario =
+        JSON.parse(localStorage.getItem("usuarioLogado"));
+
+    const membros = obterMembrosDoCanal(grupoNome, canalAtual);
+
+    if (usuario && usuario.nome && !membros.includes(usuario.nome)) {
+        registrarMembroNoCanal(usuario.nome, grupoNome, canalAtual);
+        membros.push(usuario.nome);
+    }
+
+    membersTitle.textContent = "MEMBROS - " + membros.length;
+    membersList.innerHTML = "";
+
+    membros.forEach((nome) => {
+        const membro = document.createElement("div");
+        membro.className = "member";
+
+        const avatar = document.createElement("div");
+        avatar.className = "member-avatar";
+        avatar.textContent = nome.charAt(0).toUpperCase();
+
+        const nomeMembro = document.createElement("span");
+        nomeMembro.textContent = nome;
+
+        membro.append(avatar, nomeMembro);
+        membersList.appendChild(membro);
+    });
+}
 
 
 // ==========================
@@ -399,6 +496,14 @@ if (
             "mensagens",
             JSON.stringify(todasMensagens)
         );
+
+        registrarMembroNoCanal(
+            nome,
+            grupoNome,
+            canalAtual
+        );
+
+        atualizarMembrosDoCanal();
 
         adicionarMensagemNaTela(
             mensagem
@@ -817,6 +922,8 @@ function trocarCanal(nome) {
     canalAtual =
         nome;
 
+    atualizarMembrosDoCanal();
+
     if (currentChannelName) {
 
         currentChannelName.textContent =
@@ -922,6 +1029,20 @@ function trocarCanal(nome) {
         }
     );
 }
+
+
+// Mantém a lista sincronizada quando outra aba altera os dados locais.
+window.addEventListener("storage", (event) => {
+
+    if (
+        event.key === "membrosDoCanal" ||
+        event.key === "mensagens" ||
+        event.key === "grupoAtual" ||
+        event.key === "usuarioLogado"
+    ) {
+        atualizarMembrosDoCanal();
+    }
+});
 
 
 // ==========================
