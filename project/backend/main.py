@@ -1,9 +1,22 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from passlib.context import CryptContext
 import psycopg2
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 pwd_context = CryptContext(
     schemes=["pbkdf2_sha256"],
@@ -13,11 +26,11 @@ pwd_context = CryptContext(
 
 def conectar_banco():
     return psycopg2.connect(
-        host="127.0.0.1",
-        database="shannonscord",
-        user="postgres",
-        password="Raf214181",
-        port=5432
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        port=os.getenv("DB_PORT")
     )
 
 
@@ -30,6 +43,10 @@ class Usuario(BaseModel):
 class Login(BaseModel):
     email: str
     senha: str
+
+class Servidor(BaseModel):
+    nome: str
+    dono_id: int
 
 
 @app.get("/")
@@ -122,3 +139,74 @@ def fazer_login(login: Login):
         "nome": usuario[1],
         "email": usuario[2]
     }
+
+@app.post("/servers")
+def criar_servidor(servidor: Servidor):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    try:
+        # Verifica se o usuário existe
+        cursor.execute(
+            """
+            SELECT id
+            FROM users
+            WHERE id = %s;
+            """,
+            (servidor.dono_id,)
+        )
+
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            raise HTTPException(
+                status_code=404,
+                detail="Usuário não encontrado."
+            )
+
+        # Cria o servidor
+        cursor.execute(
+            """
+            INSERT INTO servers (nome, dono_id)
+            VALUES (%s, %s)
+            RETURNING id;
+            """,
+            (servidor.nome, servidor.dono_id)
+        )
+
+        servidor_id = cursor.fetchone()[0]
+
+        # Adiciona o dono como membro
+        cursor.execute(
+            """
+            INSERT INTO server_members (server_id, user_id)
+            VALUES (%s, %s);
+            """,
+            (servidor_id, servidor.dono_id)
+        )
+
+        conexao.commit()
+
+        return {
+            "mensagem": "Servidor criado com sucesso!",
+            "id": servidor_id,
+            "nome": servidor.nome,
+            "dono_id": servidor.dono_id
+        }
+
+    except HTTPException:
+        conexao.rollback()
+        raise
+
+    except Exception as erro:
+        conexao.rollback()
+        print("Erro:", erro)
+
+        raise HTTPException(
+            status_code=500,
+            detail="Erro ao criar servidor."
+        )
+
+    finally:
+        cursor.close()
+        conexao.close()
