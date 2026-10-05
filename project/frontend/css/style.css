@@ -144,6 +144,7 @@ LOGIN E CADASTRO
 
 .server {
     color: white;
+    border: none;
 }
 
 .server-logo {
@@ -585,6 +586,259 @@ LOGIN E CADASTRO
 .server-selected {
     background: #4caf50;
     color: white;
+}
+
+
+/* HOME E NAVEGACAO */
+
+.home-container.is-home {
+    grid-template-columns: 70px minmax(0, 1fr);
+}
+
+.home-container.is-home .channels,
+.home-container.is-home .chat,
+.home-container.is-home .members {
+    display: none;
+}
+
+.home-container:not(.is-home) .dashboard {
+    display: none;
+}
+
+.dashboard {
+    min-width: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 85% 0%, rgba(76, 175, 80, 0.11), transparent 34%),
+        #151515;
+}
+
+.dashboard-header {
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 30px clamp(24px, 5vw, 72px);
+    border-bottom: 1px solid #292929;
+}
+
+.dashboard-eyebrow {
+    margin-bottom: 8px;
+    color: #70cf74;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1.7px;
+}
+
+.dashboard-header h1 {
+    margin-bottom: 8px;
+    font-size: clamp(25px, 3vw, 36px);
+}
+
+.dashboard-description {
+    color: #999;
+}
+
+.dashboard-account {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ddd;
+    white-space: nowrap;
+}
+
+.dashboard-account-avatar,
+.friend-avatar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #285c2b;
+    color: #d7ffd9;
+    font-weight: bold;
+}
+
+.dashboard-content {
+    width: min(100%, 1100px);
+    margin: 0 auto;
+    padding: 28px clamp(24px, 5vw, 72px) 48px;
+    overflow-y: auto;
+}
+
+.dashboard-section {
+    padding: 25px;
+    border: 1px solid #2d2d2d;
+    border-radius: 14px;
+    background: rgba(30, 30, 30, 0.92);
+}
+
+.dashboard-section + .dashboard-section {
+    margin-top: 22px;
+}
+
+.dashboard-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.dashboard-section-heading .dashboard-eyebrow {
+    margin-bottom: 5px;
+}
+
+.dashboard-section-heading h2 {
+    font-size: 20px;
+}
+
+.section-count {
+    color: #999;
+    font-size: 13px;
+}
+
+.friends-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.friend-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 70px;
+    padding: 12px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    background: #222;
+}
+
+.friend-avatar {
+    width: 40px;
+    height: 40px;
+}
+
+.friend-info h3 {
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.friend-info p {
+    color: #79c97c;
+    font-size: 12px;
+}
+
+.friends-empty {
+    grid-column: 1 / -1;
+    padding: 18px;
+    border: 1px dashed #3a3a3a;
+    border-radius: 10px;
+    color: #999;
+    line-height: 1.5;
+}
+
+.notices-list {
+    display: grid;
+    gap: 10px;
+}
+
+.notice-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #242424;
+}
+
+.notice-icon {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #343434;
+    color: #ddd;
+    font-weight: bold;
+}
+
+.notice-icon-green {
+    background: #285c2b;
+    color: #d7ffd9;
+}
+
+.notice-card h3 {
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.notice-card p {
+    color: #aaa;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+    .home-container:not(.is-home) {
+        grid-template-columns: 64px 200px minmax(0, 1fr);
+    }
+
+    .home-container:not(.is-home) .members {
+        display: none;
+    }
+
+    .home-container.is-home {
+        grid-template-columns: 64px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .home-container.is-home {
+        grid-template-columns: 58px minmax(0, 1fr);
+    }
+
+    .dashboard-header {
+        min-height: 130px;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+        padding: 24px 18px;
+    }
+
+    .dashboard-account {
+        font-size: 13px;
+    }
+
+    .dashboard-account-avatar {
+        width: 34px;
+        height: 34px;
+    }
+
+    .dashboard-content {
+        padding: 18px 14px 28px;
+    }
+
+    .dashboard-section {
+        padding: 18px 14px;
+    }
+
+    .friends-list {
+        grid-template-columns: 1fr;
+    }
+
+    .home-container:not(.is-home) {
+        grid-template-columns: 58px minmax(120px, 35vw) minmax(0, 1fr);
+    }
 }
 
 .channel-category {

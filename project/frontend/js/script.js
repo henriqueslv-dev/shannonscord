@@ -320,6 +320,168 @@ const membersTitle =
 const membersList =
     document.querySelector("#members-list");
 
+const homeContainer =
+    document.querySelector("#home-container");
+
+const homeButton =
+    document.querySelector("#abrir-inicio");
+
+const welcomeName =
+    document.querySelector("#welcome-name");
+
+const dashboardUsername =
+    document.querySelector("#dashboard-username");
+
+const dashboardAvatar =
+    document.querySelector("#dashboard-avatar");
+
+const friendsList =
+    document.querySelector("#friends-list");
+
+const friendsCount =
+    document.querySelector("#friends-count");
+
+
+// ==========================
+// HOME
+// ==========================
+
+function atualizarHome() {
+
+    if (!homeContainer) {
+        return;
+    }
+
+    const usuario =
+        JSON.parse(localStorage.getItem("usuarioLogado") || "null");
+
+    const nome =
+        usuario && usuario.nome
+            ? usuario.nome
+            : "amigo";
+
+    if (welcomeName) {
+        welcomeName.textContent =
+            nome === "amigo" ? "" : `, ${nome}`;
+    }
+
+    if (dashboardUsername) {
+        dashboardUsername.textContent =
+            usuario && usuario.nome ? usuario.nome : "Minha conta";
+    }
+
+    if (dashboardAvatar) {
+        dashboardAvatar.textContent =
+            nome.charAt(0).toUpperCase();
+    }
+
+    if (!friendsList || !friendsCount) {
+        return;
+    }
+
+    const amigosSalvos =
+        JSON.parse(localStorage.getItem("amigos") || "[]");
+
+    const amigos =
+        Array.isArray(amigosSalvos)
+            ? amigosSalvos
+                .map((amigo) => {
+                    if (typeof amigo === "string") {
+                        return amigo.trim();
+                    }
+
+                    if (!amigo || typeof amigo !== "object") {
+                        return "";
+                    }
+
+                    const nomeAmigo =
+                        [amigo.nome, amigo.username, amigo.name]
+                            .find((valor) => typeof valor === "string");
+
+                    return nomeAmigo ? nomeAmigo.trim() : "";
+                })
+                .filter(Boolean)
+            : [];
+
+    friendsList.replaceChildren();
+    friendsCount.textContent =
+        `${amigos.length} ${amigos.length === 1 ? "amigo" : "amigos"}`;
+
+    if (amigos.length === 0) {
+        const emptyState =
+            document.createElement("p");
+
+        emptyState.className = "friends-empty";
+        emptyState.textContent =
+            "Sua lista de amigos aparecerá aqui quando você adicionar alguém.";
+
+        friendsList.appendChild(emptyState);
+        return;
+    }
+
+    amigos.forEach((nomeAmigo) => {
+
+        const friendCard =
+            document.createElement("article");
+
+        friendCard.className = "friend-card";
+
+        const avatar =
+            document.createElement("span");
+
+        avatar.className = "friend-avatar";
+        avatar.textContent =
+            nomeAmigo.trim().charAt(0).toUpperCase() || "?";
+
+        const info =
+            document.createElement("div");
+
+        info.className = "friend-info";
+
+        const friendName =
+            document.createElement("h3");
+
+        friendName.textContent = nomeAmigo;
+
+        const status =
+            document.createElement("p");
+
+        status.textContent = "Amigo";
+
+        info.append(friendName, status);
+        friendCard.append(avatar, info);
+        friendsList.appendChild(friendCard);
+    });
+}
+
+function abrirInicio() {
+
+    if (!homeContainer) {
+        return;
+    }
+
+    homeContainer.classList.add("is-home");
+
+    document
+        .querySelectorAll("#server-list .server")
+        .forEach((server) => server.classList.remove("server-selected"));
+
+    if (homeButton) {
+        homeButton.classList.add("server-selected");
+        homeButton.setAttribute("aria-current", "page");
+    }
+
+    document
+        .querySelectorAll("#server-list .server")
+        .forEach((server) => server.removeAttribute("aria-current"));
+}
+
+if (homeButton) {
+    homeButton.addEventListener("click", abrirInicio);
+}
+
+atualizarHome();
+
 
 // ==========================
 // CANAL ATUAL
@@ -702,15 +864,18 @@ function adicionarGrupoNaTela(grupo) {
     }
 
     const elemento =
-        document.createElement("div");
+        document.createElement("button");
 
     elemento.className = "server";
+    elemento.type = "button";
 
     elemento.textContent =
         grupo.inicial;
 
     elemento.title =
         grupo.nome;
+
+    elemento.setAttribute("aria-label", grupo.nome);
 
     elemento.addEventListener(
         "click",
@@ -733,12 +898,21 @@ function adicionarGrupoNaTela(grupo) {
 // SELECIONAR GRUPO
 // ==========================
 
-function selecionarGrupo(grupo) {
+function selecionarGrupo(grupo, abrirGrupo = true) {
 
     localStorage.setItem(
         "grupoAtual",
         grupo.nome
     );
+
+    if (abrirGrupo && homeContainer) {
+        homeContainer.classList.remove("is-home");
+    }
+
+    if (abrirGrupo && homeButton) {
+        homeButton.classList.remove("server-selected");
+        homeButton.removeAttribute("aria-current");
+    }
 
     if (currentGroupName) {
 
@@ -754,8 +928,10 @@ function selecionarGrupo(grupo) {
             server.classList.remove(
                 "server-selected"
             );
+            server.removeAttribute("aria-current");
 
             if (
+                abrirGrupo &&
                 server.title ===
                 grupo.nome
             ) {
@@ -763,6 +939,7 @@ function selecionarGrupo(grupo) {
                 server.classList.add(
                     "server-selected"
                 );
+                server.setAttribute("aria-current", "page");
 
             }
 
@@ -822,9 +999,7 @@ if (gruposSalvos.length > 0) {
 
     }
 
-    selecionarGrupo(
-        grupoSelecionado
-    );
+    selecionarGrupo(grupoSelecionado, false);
 }
 
 

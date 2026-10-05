@@ -16,16 +16,18 @@
 
 <body>
 
-    <main class="home-container" id="home-container">
+    <main class="home-container is-home" id="home-container">
 
         <!-- SERVIDORES -->
 
         <aside class="servers">
 
             <button
-                class="server-logo home-button"
+                class="server-logo home-button server-selected"
                 id="abrir-inicio"
                 title="Início"
+                aria-label="Abrir início"
+                aria-current="page"
                 type="button"
             >
                 S
@@ -40,10 +42,61 @@
                 +
             </button>
 
-            <div id="server-list"></div>
+            <nav id="server-list" aria-label="Seus grupos"></nav>
 
         </aside>
 
+        <section class="dashboard" id="home-dashboard" aria-labelledby="welcome-title">
+            <header class="dashboard-header">
+                <div>
+                    <p class="dashboard-eyebrow">SHANNONSCORD</p>
+                    <h1 id="welcome-title">Bem-vindo<span id="welcome-name"></span>!</h1>
+                    <p class="dashboard-description">Seu espaço para conversar e ficar por dentro.</p>
+                </div>
+                <div class="dashboard-account" aria-label="Sua conta">
+                    <span class="dashboard-account-avatar" id="dashboard-avatar">?</span>
+                    <span id="dashboard-username">Minha conta</span>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <section class="dashboard-section friends-section" aria-labelledby="friends-title">
+                    <div class="dashboard-section-heading">
+                        <div>
+                            <p class="dashboard-eyebrow">CONECTE-SE</p>
+                            <h2 id="friends-title">Seus amigos</h2>
+                        </div>
+                        <span class="section-count" id="friends-count">0 amigos</span>
+                    </div>
+                    <div class="friends-list" id="friends-list" aria-live="polite"></div>
+                </section>
+
+                <section class="dashboard-section notices-section" aria-labelledby="notices-title">
+                    <div class="dashboard-section-heading">
+                        <div>
+                            <p class="dashboard-eyebrow">FIQUE POR DENTRO</p>
+                            <h2 id="notices-title">Avisos</h2>
+                        </div>
+                    </div>
+                    <div class="notices-list" id="notices-list">
+                        <article class="notice-card">
+                            <span class="notice-icon" aria-hidden="true">i</span>
+                            <div>
+                                <h3>Bem-vindo ao ShannonsCord</h3>
+                                <p>Esta é sua home. Seus grupos ficam disponíveis na barra lateral.</p>
+                            </div>
+                        </article>
+                        <article class="notice-card">
+                            <span class="notice-icon notice-icon-green" aria-hidden="true">+</span>
+                            <div>
+                                <h3>Encontre seus grupos</h3>
+                                <p>Selecione um grupo na lateral para acessar os canais e conversas.</p>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </section>
 
         <!-- CANAIS -->
 
@@ -57,26 +110,6 @@
 
 
             <div class="channels-list">
-
-                <nav class="home-navigation" aria-label="Navegação inicial">
-
-                    <button
-                        class="home-nav-button active"
-                        id="abrir-amigos"
-                        type="button"
-                    >
-                        Amigos
-                    </button>
-
-                    <button
-                        class="home-nav-button"
-                        id="abrir-alertas"
-                        type="button"
-                    >
-                        Alertas
-                    </button>
-
-                </nav>
 
                 <div class="channel-category channel-navigation">
 
@@ -138,17 +171,6 @@
         <!-- CHAT -->
 
         <section class="chat">
-
-            <section class="initial-screen" id="initial-screen">
-
-                <header class="initial-header">
-                    <h2 id="initial-title">Amigos</h2>
-                    <p id="initial-subtitle">Pessoas que você adicionou</p>
-                </header>
-
-                <div class="initial-content" id="initial-content" aria-live="polite"></div>
-
-            </section>
 
             <header class="chat-header">
 
