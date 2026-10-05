@@ -142,6 +142,10 @@ LOGIN E CADASTRO
     font-size: 20px;
 }
 
+.server {
+    color: white;
+}
+
 .server-logo {
     background: #4caf50;
 
@@ -538,7 +542,7 @@ LOGIN E CADASTRO
 }
 
 .group-input:focus {
-    border-color: #81e0ff;
+    border-color: #4caf50;
 }
 
 
@@ -569,7 +573,7 @@ LOGIN E CADASTRO
 }
 
 .group-create {
-    background: #81e0ff;
+    background: #4caf50;
     color: #111;
 }
 
@@ -579,8 +583,8 @@ LOGIN E CADASTRO
 }
 
 .server-selected {
-    background: #81e0ff;
-    color: #111;
+    background: #4caf50;
+    color: white;
 }
 
 .channel-category {
@@ -692,6 +696,6 @@ LOGIN E CADASTRO
 }
 
 #channel-create {
-    background: #81e0ff;
+    background: #4caf50;
     color: #111;
 }

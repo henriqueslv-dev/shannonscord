@@ -16,15 +16,20 @@
 
 <body>
 
-    <main class="home-container">
+    <main class="home-container" id="home-container">
 
         <!-- SERVIDORES -->
 
         <aside class="servers">
 
-            <div class="server-logo">
+            <button
+                class="server-logo home-button"
+                id="abrir-inicio"
+                title="Início"
+                type="button"
+            >
                 S
-            </div>
+            </button>
 
             <button
                 class="server server-create"
@@ -53,7 +58,27 @@
 
             <div class="channels-list">
 
-                <div class="channel-category">
+                <nav class="home-navigation" aria-label="Navegação inicial">
+
+                    <button
+                        class="home-nav-button active"
+                        id="abrir-amigos"
+                        type="button"
+                    >
+                        Amigos
+                    </button>
+
+                    <button
+                        class="home-nav-button"
+                        id="abrir-alertas"
+                        type="button"
+                    >
+                        Alertas
+                    </button>
+
+                </nav>
+
+                <div class="channel-category channel-navigation">
 
                     <span>
                         CANAIS DE TEXTO
@@ -113,6 +138,17 @@
         <!-- CHAT -->
 
         <section class="chat">
+
+            <section class="initial-screen" id="initial-screen">
+
+                <header class="initial-header">
+                    <h2 id="initial-title">Amigos</h2>
+                    <p id="initial-subtitle">Pessoas que você adicionou</p>
+                </header>
+
+                <div class="initial-content" id="initial-content" aria-live="polite"></div>
+
+            </section>
 
             <header class="chat-header">
 

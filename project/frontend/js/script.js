@@ -931,6 +931,13 @@ function trocarCanal(nome) {
 
     }
 
+    if (messageInput) {
+
+        messageInput.placeholder =
+            "Enviar mensagem em #" + nome;
+
+    }
+
     document
         .querySelectorAll(".channel")
         .forEach((canal) => {
