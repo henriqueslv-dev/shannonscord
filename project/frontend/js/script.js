@@ -48,12 +48,61 @@ function mostrarNotificacao(tipo, titulo, mensagem) {
 // LOGIN
 // ==========================
 
+const API_URL = "http://127.0.0.1:8000";
+
+class ErroRequisicaoApi extends Error {
+    constructor(mensagem, status = null) {
+        super(mensagem);
+        this.status = status;
+    }
+}
+
+async function enviarRequisicaoApi(endpoint, dados) {
+    let resposta;
+
+    try {
+        resposta = await fetch(`${API_URL}${endpoint}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)
+        });
+    } catch {
+        throw new ErroRequisicaoApi(
+            "Não foi possível conectar à API. Verifique se o servidor está ativo."
+        );
+    }
+
+    let resultado;
+
+    try {
+        resultado = await resposta.json();
+    } catch {
+        throw new ErroRequisicaoApi(
+            "A API retornou uma resposta inválida.",
+            resposta.status
+        );
+    }
+
+    if (!resposta.ok) {
+        const mensagem =
+            typeof resultado.detail === "string"
+                ? resultado.detail
+                : "Não foi possível concluir a solicitação.";
+
+        throw new ErroRequisicaoApi(mensagem, resposta.status);
+    }
+
+    return resultado;
+}
+
 const loginForm =
     document.querySelector("#login-form");
 
 if (loginForm) {
 
-    loginForm.addEventListener("submit", (event) => {
+    loginForm.addEventListener("submit", async (event) => {
 
         event.preventDefault();
 
@@ -85,48 +134,57 @@ if (loginForm) {
             return;
         }
 
-        const usuario =
-            JSON.parse(localStorage.getItem("usuario"));
+        try {
+            const resultado = await enviarRequisicaoApi("/login", {
+                email: email,
+                senha: senha
+            });
 
-        if (!usuario) {
+            if (!resultado.nome || !resultado.email) {
+                mostrarNotificacao(
+                    "erro",
+                    "Erro no login",
+                    "A API retornou dados incompletos do usuário."
+                );
 
-            mostrarNotificacao(
-                "aviso",
-                "Nenhuma conta encontrada",
-                "Crie uma conta antes de entrar."
+                return;
+            }
+
+            const usuario = {
+                id: resultado.id,
+                nome: resultado.nome,
+                email: resultado.email
+            };
+
+            localStorage.setItem(
+                "usuarioLogado",
+                JSON.stringify(usuario)
             );
 
-            return;
-        }
-
-        if (
-            email !== usuario.email ||
-            senha !== usuario.senha
-        ) {
-
             mostrarNotificacao(
-                "erro",
-                "Login inválido",
-                "E-mail ou senha incorretos."
+                "sucesso",
+                "Login realizado!",
+                "Bem-vindo ao ShannonsCord."
             );
 
-            return;
+            setTimeout(() => {
+                window.location.href = "home.html";
+            }, 1200);
+        } catch (erro) {
+            if (erro.status === 401) {
+                mostrarNotificacao(
+                    "erro",
+                    "Login inválido",
+                    "E-mail ou senha incorretos."
+                );
+            } else {
+                mostrarNotificacao(
+                    "erro",
+                    "Erro no login",
+                    erro.message
+                );
+            }
         }
-
-        localStorage.setItem(
-            "usuarioLogado",
-            JSON.stringify(usuario)
-        );
-
-        mostrarNotificacao(
-            "sucesso",
-            "Login realizado!",
-            "Bem-vindo ao ShannonsCord."
-        );
-
-        setTimeout(() => {
-            window.location.href = "home.html";
-        }, 1200);
 
     });
 }
@@ -141,7 +199,7 @@ const cadastroForm =
 
 if (cadastroForm) {
 
-    cadastroForm.addEventListener("submit", (event) => {
+    cadastroForm.addEventListener("submit", async (event) => {
 
         event.preventDefault();
 
@@ -217,43 +275,37 @@ if (cadastroForm) {
             return;
         }
 
-        const usuarioExistente =
-            JSON.parse(localStorage.getItem("usuario"));
-
-        if (
-            usuarioExistente &&
-            usuarioExistente.email === email
-        ) {
+        try {
+            await enviarRequisicaoApi("/usuarios", {
+                nome: nome,
+                email: email,
+                senha: senha
+            });
 
             mostrarNotificacao(
-                "erro",
-                "E-mail já cadastrado",
-                "Use outro e-mail para criar sua conta."
+                "sucesso",
+                "Conta criada!",
+                "Sua conta foi criada com sucesso."
             );
 
-            return;
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 1200);
+        } catch (erro) {
+            if (/já (?:está )?cadastrado|ja (?:esta )?cadastrado/i.test(erro.message)) {
+                mostrarNotificacao(
+                    "erro",
+                    "E-mail já cadastrado",
+                    "Use outro e-mail para criar sua conta."
+                );
+            } else {
+                mostrarNotificacao(
+                    "erro",
+                    "Erro no cadastro",
+                    erro.message
+                );
+            }
         }
-
-        const usuario = {
-            nome: nome,
-            email: email,
-            senha: senha
-        };
-
-        localStorage.setItem(
-            "usuario",
-            JSON.stringify(usuario)
-        );
-
-        mostrarNotificacao(
-            "sucesso",
-            "Conta criada!",
-            "Sua conta foi criada com sucesso."
-        );
-
-        setTimeout(() => {
-            window.location.href = "index.html";
-        }, 1200);
 
     });
 }
