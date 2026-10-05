@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ShannonsCord</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <main class="home-container is-home" id="home-container">
+
+        <!-- SERVIDORES -->
+
+        <aside class="servers">
+
+            <button
+                class="server-logo home-button server-selected"
+                id="abrir-inicio"
+                title="Início"
+                aria-label="Abrir início"
+                aria-current="page"
+                type="button"
+            >
+                S
+            </button>
+
+            <button
+                class="server server-create"
+                id="criar-grupo"
+                title="Criar novo grupo"
+                type="button"
+            >
+                +
+            </button>
+
+            <nav id="server-list" aria-label="Seus grupos"></nav>
+
+        </aside>
+
+        <section class="dashboard" id="home-dashboard" aria-labelledby="welcome-title">
+            <header class="dashboard-header">
+                <div>
+                    <p class="dashboard-eyebrow">SHANNONSCORD</p>
+                    <h1 id="welcome-title">Bem-vindo<span id="welcome-name"></span>!</h1>
+                    <p class="dashboard-description">Seu espaço para conversar e ficar por dentro.</p>
+                </div>
+                <div class="dashboard-account" aria-label="Sua conta">
+                    <span class="dashboard-account-avatar" id="dashboard-avatar">?</span>
+                    <span id="dashboard-username">Minha conta</span>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <section class="dashboard-section friends-section" aria-labelledby="friends-title">
+                    <div class="dashboard-section-heading">
+                        <div>
+                            <p class="dashboard-eyebrow">CONECTE-SE</p>
+                            <h2 id="friends-title">Seus amigos</h2>
+                        </div>
+                        <span class="section-count" id="friends-count">0 amigos</span>
+                    </div>
+                    <div class="friends-list" id="friends-list" aria-live="polite"></div>
+                </section>
+
+                <section class="dashboard-section notices-section" aria-labelledby="notices-title">
+                    <div class="dashboard-section-heading">
+                        <div>
+                            <p class="dashboard-eyebrow">FIQUE POR DENTRO</p>
+                            <h2 id="notices-title">Avisos</h2>
+                        </div>
+                    </div>
+                    <div class="notices-list" id="notices-list">
+                        <article class="notice-card">
+                            <span class="notice-icon" aria-hidden="true">i</span>
+                            <div>
+                                <h3>Bem-vindo ao ShannonsCord</h3>
+                                <p>Esta é sua home. Seus grupos ficam disponíveis na barra lateral.</p>
+                            </div>
+                        </article>
+                        <article class="notice-card">
+                            <span class="notice-icon notice-icon-green" aria-hidden="true">+</span>
+                            <div>
+                                <h3>Encontre seus grupos</h3>
+                                <p>Selecione um grupo na lateral para acessar os canais e conversas.</p>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <!-- CANAIS -->
+
+        <aside class="channels">
+
+            <div class="channels-header">
+                <h2 id="current-group-name">
+                    ShannonsCord
+                </h2>
+            </div>
+
+
+            <div class="channels-list">
+
+                <div class="channel-category channel-navigation">
+
+                    <span>
+                        CANAIS DE TEXTO
+                    </span>
+
+                    <button
+                        id="criar-canal"
+                        title="Criar canal"
+                        type="button"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+
+                <div id="channel-list"></div>
+
+            </div>
+
+
+            <!-- USUÁRIO -->
+
+            <div class="user-area">
+
+                <div class="user-info">
+
+                    <div class="user-avatar">
+                        R
+                    </div>
+
+                    <div>
+                        <p class="username">
+                            Rodzin
+                        </p>
+
+                        <p class="user-status">
+                            Online
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="user-button"
+                    type="button"
+                >
+                    ⚙
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- CHAT -->
+
+        <section class="chat">
+
+            <header class="chat-header">
+
+                <h2 id="current-channel-name">
+                    # geral
+                </h2>
+
+            </header>
+
+
+            <div class="messages">
+
+                <div class="message">
+
+                    <div class="message-avatar">
+                        R
+                    </div>
+
+                    <div class="message-content">
+
+                        <div class="message-info">
+
+                            <strong>
+                                Rodzin
+                            </strong>
+
+                            <span>
+                                Hoje às 22:30
+                            </span>
+
+                        </div>
+
+                        <p>
+                            Bem-vindo ao ShannonsCord!
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="message">
+
+                    <div class="message-avatar">
+                        H
+                    </div>
+
+                    <div class="message-content">
+
+                        <div class="message-info">
+
+                            <strong>
+                                Henrique
+                            </strong>
+
+                            <span>
+                                Hoje às 22:31
+                            </span>
+
+                        </div>
+
+                        <p>
+                            Nosso projeto está começando!
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <form class="message-form">
+
+                <input
+                    class="message-input"
+                    type="text"
+                    placeholder="Enviar mensagem em #geral"
+                >
+
+                <button
+                    class="message-button"
+                    type="submit"
+                >
+                    Enviar
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- MEMBROS -->
+
+        <aside class="members">
+
+            <h3 id="members-title">MEMBROS - 0</h3>
+
+            <div id="members-list" aria-live="polite"></div>
+
+        </aside>
+
+    </main>
+
+
+    <!-- MODAL DE GRUPO -->
+
+    <div
+        class="group-modal"
+        id="group-modal"
+    >
+
+        <div class="group-modal-box">
+
+            <h2>
+                Criar novo grupo
+            </h2>
+
+            <p>
+                Escolha um nome para o seu grupo.
+            </p>
+
+            <input
+                class="group-input"
+                id="group-name"
+                type="text"
+                placeholder="Nome do grupo"
+                maxlength="30"
+            >
+
+            <div class="group-buttons">
+
+                <button
+                    class="group-cancel"
+                    id="group-cancel"
+                    type="button"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    class="group-create"
+                    id="group-create"
+                    type="button"
+                >
+                    Criar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MODAL DE CANAL -->
+
+    <div
+        class="channel-modal"
+        id="channel-modal"
+    >
+
+        <div class="channel-modal-box">
+
+            <h2>
+                Criar canal
+            </h2>
+
+            <p>
+                Escolha um nome para o canal.
+            </p>
+
+            <input
+                class="channel-input"
+                id="channel-name"
+                type="text"
+                placeholder="Nome do canal"
+                maxlength="30"
+            >
+
+            <div class="channel-buttons">
+
+                <button
+                    id="channel-cancel"
+                    type="button"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    id="channel-create"
+                    type="button"
+                >
+                    Criar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>
