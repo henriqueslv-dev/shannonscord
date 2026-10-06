@@ -57,17 +57,21 @@ class ErroRequisicaoApi extends Error {
     }
 }
 
-async function enviarRequisicaoApi(endpoint, dados) {
+async function enviarRequisicaoApi(endpoint, dados, metodo = "POST") {
     let resposta;
+    const opcoes = {
+        method: metodo
+    };
+
+    if (dados) {
+        opcoes.headers = {
+            "Content-Type": "application/json"
+        };
+        opcoes.body = JSON.stringify(dados);
+    }
 
     try {
-        resposta = await fetch(`${API_URL}${endpoint}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(dados)
-        });
+        resposta = await fetch(`${API_URL}${endpoint}`, opcoes);
     } catch {
         throw new ErroRequisicaoApi(
             "Não foi possível conectar à API. Verifique se o servidor está ativo."
@@ -540,6 +544,10 @@ atualizarHome();
 // ==========================
 
 let canalAtual = "geral";
+let canaisDoServidor = [];
+let idServidorDosCanais = null;
+let requisicaoCanaisAtual = 0;
+let canaisCarregando = false;
 
 
 // ==========================
@@ -667,7 +675,7 @@ if (
         const grupoNome =
             localStorage.getItem("grupoAtual");
 
-        if (!grupoNome) {
+        if (!grupoNome || !canalAtual) {
             return;
         }
 
@@ -825,9 +833,11 @@ if (groupCancel) {
 // CONFIRMAR GRUPO
 // ==========================
 
+let gruposSalvos = [];
+
 if (groupCreate) {
 
-    groupCreate.addEventListener("click", () => {
+    groupCreate.addEventListener("click", async () => {
 
         const nome =
             groupName.value.trim();
@@ -843,13 +853,8 @@ if (groupCreate) {
             return;
         }
 
-        const grupos =
-            JSON.parse(
-                localStorage.getItem("grupos")
-            ) || [];
-
         const grupoExiste =
-            grupos.some(
+            gruposSalvos.some(
                 (grupo) =>
                     grupo.nome.toLowerCase() ===
                     nome.toLowerCase()
@@ -866,39 +871,60 @@ if (groupCreate) {
             return;
         }
 
-        const grupo = {
+        const usuario =
+            JSON.parse(localStorage.getItem("usuarioLogado") || "null");
 
-            nome: nome,
+        if (!usuario || !Number.isInteger(Number(usuario.id)) || Number(usuario.id) < 1) {
+            mostrarNotificacao(
+                "erro",
+                "Sessão inválida",
+                "Entre novamente para criar um servidor."
+            );
 
-            inicial:
-                nome.charAt(0).toUpperCase()
+            return;
+        }
 
-        };
+        try {
+            const resultado = await enviarRequisicaoApi("/servers", {
+                nome: nome,
+                dono_id: Number(usuario.id)
+            });
 
-        grupos.push(grupo);
+            if (
+                !Number.isInteger(Number(resultado.id)) ||
+                Number(resultado.id) < 1 ||
+                typeof resultado.nome !== "string" ||
+                !resultado.nome
+            ) {
+                throw new Error("A API retornou dados inválidos do servidor criado.");
+            }
 
-        localStorage.setItem(
-            "grupos",
-            JSON.stringify(grupos)
-        );
+            const grupo = {
+                id: Number(resultado.id),
+                nome: resultado.nome,
+                inicial: resultado.nome.charAt(0).toUpperCase()
+            };
 
-        adicionarGrupoNaTela(
-            grupo
-        );
+            gruposSalvos.push(grupo);
+            adicionarGrupoNaTela(grupo);
 
-        groupModal.classList.remove("show");
+            groupModal.classList.remove("show");
+            groupName.value = "";
 
-        groupName.value = "";
+            selecionarGrupo(grupo);
 
-        selecionarGrupo(
-            grupo
-        );
-
-        mostrarNotificacao(
-            "sucesso",
-            "Grupo criado!",
-            `O grupo "${nome}" foi criado.`
-        );
+            mostrarNotificacao(
+                "sucesso",
+                "Grupo criado!",
+                `O grupo "${grupo.nome}" foi criado.`
+            );
+        } catch (erro) {
+            mostrarNotificacao(
+                "erro",
+                "Erro ao criar servidor",
+                erro.message
+            );
+        }
 
     });
 
@@ -928,6 +954,9 @@ function adicionarGrupoNaTela(grupo) {
         grupo.nome;
 
     elemento.setAttribute("aria-label", grupo.nome);
+    if (grupo.id !== undefined) {
+        elemento.setAttribute("data-server-id", String(grupo.id));
+    }
 
     elemento.addEventListener(
         "click",
@@ -956,6 +985,12 @@ function selecionarGrupo(grupo, abrirGrupo = true) {
         "grupoAtual",
         grupo.nome
     );
+    if (grupo.id !== undefined) {
+        localStorage.setItem(
+            "servidorAtualId",
+            String(grupo.id)
+        );
+    }
 
     if (abrirGrupo && homeContainer) {
         homeContainer.classList.remove("is-home");
@@ -982,11 +1017,11 @@ function selecionarGrupo(grupo, abrirGrupo = true) {
             );
             server.removeAttribute("aria-current");
 
-            if (
-                abrirGrupo &&
-                server.title ===
-                grupo.nome
-            ) {
+            const mesmoServidor = grupo.id !== undefined
+                ? server.getAttribute("data-server-id") === String(grupo.id)
+                : server.title === grupo.nome;
+
+            if (abrirGrupo && mesmoServidor) {
 
                 server.classList.add(
                     "server-selected"
@@ -998,7 +1033,8 @@ function selecionarGrupo(grupo, abrirGrupo = true) {
         });
 
     carregarCanais(
-        grupo.nome
+        grupo.nome,
+        grupo.id
     );
 }
 
@@ -1007,97 +1043,201 @@ function selecionarGrupo(grupo, abrirGrupo = true) {
 // CARREGAR GRUPOS
 // ==========================
 
-const gruposSalvos =
-    JSON.parse(
-        localStorage.getItem("grupos")
-    ) || [];
-
-if (serverList) {
-
-    serverList.innerHTML = "";
-
-    gruposSalvos.forEach(
-        (grupo) => {
-
-            adicionarGrupoNaTela(
-                grupo
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================
-// SELECIONAR GRUPO INICIAL
-// ==========================
-
-const grupoAtual =
-    localStorage.getItem("grupoAtual");
-
-if (gruposSalvos.length > 0) {
-
-    let grupoSelecionado =
-        gruposSalvos.find(
-            (grupo) =>
-                grupo.nome === grupoAtual
-        );
-
-    if (!grupoSelecionado) {
-
-        grupoSelecionado =
-            gruposSalvos[0];
-
+async function carregarGruposDoUsuario() {
+    if (!serverList) {
+        return;
     }
 
-    selecionarGrupo(grupoSelecionado, false);
+    const usuario =
+        JSON.parse(localStorage.getItem("usuarioLogado") || "null");
+
+    if (!usuario || !Number.isInteger(Number(usuario.id)) || Number(usuario.id) < 1) {
+        mostrarNotificacao(
+            "erro",
+            "Sessão inválida",
+            "Entre novamente para carregar seus servidores."
+        );
+
+        return;
+    }
+
+    try {
+        const resultado = await enviarRequisicaoApi(
+            `/servers/${encodeURIComponent(Number(usuario.id))}`,
+            null,
+            "GET"
+        );
+
+        if (!Array.isArray(resultado)) {
+            throw new Error("A API retornou uma lista de servidores inválida.");
+        }
+
+        gruposSalvos = resultado.map((servidor) => {
+            if (
+                !servidor ||
+                !Number.isInteger(Number(servidor.id)) ||
+                Number(servidor.id) < 1 ||
+                typeof servidor.nome !== "string" ||
+                !servidor.nome
+            ) {
+                throw new Error("A API retornou dados inválidos de um servidor.");
+            }
+
+            return {
+                id: Number(servidor.id),
+                nome: servidor.nome,
+                inicial: servidor.nome.charAt(0).toUpperCase()
+            };
+        });
+
+        serverList.innerHTML = "";
+        gruposSalvos.forEach(adicionarGrupoNaTela);
+
+        if (gruposSalvos.length === 0) {
+            return;
+        }
+
+        const servidorAtualId =
+            localStorage.getItem("servidorAtualId");
+        const grupoAtual =
+            localStorage.getItem("grupoAtual");
+        const grupoSelecionado =
+            gruposSalvos.find((grupo) => String(grupo.id) === servidorAtualId) ||
+            gruposSalvos.find((grupo) => grupo.nome === grupoAtual) ||
+            gruposSalvos[0];
+
+        selecionarGrupo(grupoSelecionado, false);
+    } catch (erro) {
+        mostrarNotificacao(
+            "erro",
+            "Erro ao carregar servidores",
+            erro.message
+        );
+    }
 }
+
+carregarGruposDoUsuario();
 
 
 // ==========================
 // CARREGAR CANAIS
 // ==========================
 
-function carregarCanais(grupoNome) {
+async function carregarCanais(grupoNome, serverId) {
 
     if (!channelList) {
         return;
     }
 
+    const requisicao = ++requisicaoCanaisAtual;
     channelList.innerHTML = "";
+    canaisDoServidor = [];
+    canalAtual = "";
+    limparCanalSelecionado();
+    const numeroServidor = Number(serverId);
 
-    const canais =
-        JSON.parse(
-            localStorage.getItem("canais")
-        ) || {};
-
-    if (!canais[grupoNome]) {
-
-        canais[grupoNome] = [
-            "geral"
-        ];
-
-        localStorage.setItem(
-            "canais",
-            JSON.stringify(canais)
+    if (!Number.isInteger(numeroServidor) || numeroServidor < 1) {
+        idServidorDosCanais = null;
+        canaisCarregando = false;
+        mostrarNotificacao(
+            "erro",
+            "Servidor inválido",
+            "Não foi possível identificar o servidor para carregar os canais."
         );
-
+        return;
     }
 
-    canais[grupoNome].forEach(
-        (nome) => {
+    idServidorDosCanais = numeroServidor;
+    canaisCarregando = true;
 
-            adicionarCanalNaTela(
-                nome
-            );
+    try {
+        const resultado = await enviarRequisicaoApi(
+            `/servers/${encodeURIComponent(numeroServidor)}/channels`,
+            null,
+            "GET"
+        );
 
+        if (requisicao !== requisicaoCanaisAtual) {
+            return;
         }
-    );
 
-    trocarCanal(
-        "geral"
-    );
+        if (!Array.isArray(resultado)) {
+            throw new Error("A API retornou uma lista de canais inválida.");
+        }
+
+        canaisDoServidor = resultado.map((canal) => {
+            if (
+                !canal ||
+                typeof canal.nome !== "string" ||
+                !canal.nome.trim() ||
+                (canal.server_id !== undefined &&
+                    Number(canal.server_id) !== numeroServidor)
+            ) {
+                throw new Error("A API retornou dados inválidos de um canal.");
+            }
+
+            return {
+                id: canal.id,
+                nome: canal.nome.trim(),
+                server_id: canal.server_id
+            };
+        });
+
+        canaisDoServidor.forEach((canal) => {
+            adicionarCanalNaTela(canal.nome);
+        });
+
+        if (canaisDoServidor.length === 0) {
+            canalAtual = "";
+            limparCanalSelecionado();
+            return;
+        }
+
+        const canalInicial =
+            canaisDoServidor.find(
+                (canal) => canal.nome.toLowerCase() === "geral"
+            ) || canaisDoServidor[0];
+
+        trocarCanal(canalInicial.nome);
+    } catch (erro) {
+        if (requisicao === requisicaoCanaisAtual) {
+            canalAtual = "";
+            canaisDoServidor = [];
+            channelList.innerHTML = "";
+            limparCanalSelecionado();
+            mostrarNotificacao(
+                "erro",
+                "Erro ao carregar canais",
+                erro.message
+            );
+        }
+    } finally {
+        if (requisicao === requisicaoCanaisAtual) {
+            canaisCarregando = false;
+        }
+    }
+}
+
+function limparCanalSelecionado() {
+    if (currentChannelName) {
+        currentChannelName.textContent = "# sem canais";
+    }
+
+    if (messageInput) {
+        messageInput.placeholder = "Crie um canal para começar";
+    }
+
+    if (messages) {
+        messages.innerHTML = "";
+    }
+
+    if (membersTitle) {
+        membersTitle.textContent = "MEMBROS - 0";
+    }
+
+    if (membersList) {
+        membersList.innerHTML = "";
+    }
 }
 
 
@@ -1215,36 +1355,33 @@ function trocarCanal(nome) {
     ) {
 
         const mensagem =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
+        mensagem.className = "message";
 
-        mensagem.className =
-            "message";
+        const conteudo =
+            document.createElement("div");
+        conteudo.className = "message-content";
 
-        mensagem.innerHTML = `
+        const informacoes =
+            document.createElement("div");
+        informacoes.className = "message-info";
 
-            <div class="message-content">
+        const autor =
+            document.createElement("strong");
+        autor.textContent = "ShannonsCord";
 
-                <div class="message-info">
+        const horario =
+            document.createElement("span");
+        horario.textContent = "Agora";
 
-                    <strong>
-                        ShannonsCord
-                    </strong>
+        informacoes.append(autor, horario);
 
-                    <span>
-                        Agora
-                    </span>
+        const texto =
+            document.createElement("p");
+        texto.textContent = `Você entrou no canal #${nome}.`;
 
-                </div>
-
-                <p>
-                    Você entrou no canal #${nome}.
-                </p>
-
-            </div>
-
-        `;
+        conteudo.append(informacoes, texto);
+        mensagem.appendChild(conteudo);
 
         messages.appendChild(
             mensagem
@@ -1331,7 +1468,7 @@ if (channelCreate) {
 
     channelCreate.addEventListener(
         "click",
-        () => {
+        async () => {
 
             const nome =
                 channelName.value.trim();
@@ -1363,25 +1500,37 @@ if (channelCreate) {
                 return;
             }
 
-            const canais =
-                JSON.parse(
-                    localStorage.getItem(
-                        "canais"
-                    )
-                ) || {};
+            const servidorId =
+                Number(localStorage.getItem("servidorAtualId"));
 
-            if (!canais[grupoNome]) {
+            if (
+                !Number.isInteger(servidorId) ||
+                servidorId < 1 ||
+                servidorId !== idServidorDosCanais
+            ) {
+                mostrarNotificacao(
+                    "erro",
+                    "Servidor inválido",
+                    "Selecione um servidor válido antes de criar um canal."
+                );
 
-                canais[grupoNome] = [
-                    "geral"
-                ];
+                return;
+            }
 
+            if (canaisCarregando) {
+                mostrarNotificacao(
+                    "aviso",
+                    "Aguarde",
+                    "Os canais do servidor ainda estão sendo carregados."
+                );
+
+                return;
             }
 
             const canalExiste =
-                canais[grupoNome].some(
+                canaisDoServidor.some(
                     (canal) =>
-                        canal.toLowerCase() ===
+                        canal.nome.toLowerCase() ===
                         nome.toLowerCase()
                 );
 
@@ -1396,36 +1545,64 @@ if (channelCreate) {
                 return;
             }
 
-            canais[grupoNome].push(
-                nome
-            );
+            channelCreate.disabled = true;
 
-            localStorage.setItem(
-                "canais",
-                JSON.stringify(
-                    canais
-                )
-            );
+            try {
+                const resultado = await enviarRequisicaoApi("/channels", {
+                    nome: nome,
+                    server_id: servidorId
+                });
 
-            carregarCanais(
-                grupoNome
-            );
+                if (
+                    !resultado ||
+                    typeof resultado.nome !== "string" ||
+                    !resultado.nome.trim() ||
+                    (resultado.server_id !== undefined &&
+                        Number(resultado.server_id) !== servidorId)
+                ) {
+                    throw new Error("A API retornou dados inválidos do canal criado.");
+                }
 
-            trocarCanal(
-                nome
-            );
+                const canalCriado = {
+                    id: resultado.id,
+                    nome: resultado.nome.trim(),
+                    server_id: resultado.server_id
+                };
 
-            channelModal.classList.remove(
-                "show"
-            );
+                const servidorAindaSelecionado =
+                    Number(localStorage.getItem("servidorAtualId")) === servidorId &&
+                    localStorage.getItem("grupoAtual") === grupoNome;
 
-            channelName.value = "";
+                if (servidorAindaSelecionado) {
+                    if (idServidorDosCanais === servidorId && !canaisCarregando) {
+                        canaisDoServidor.push(canalCriado);
+                        adicionarCanalNaTela(canalCriado.nome);
+                        trocarCanal(canalCriado.nome);
+                    } else {
+                        await carregarCanais(grupoNome, servidorId);
+                        if (canaisDoServidor.some((canal) => canal.nome === canalCriado.nome)) {
+                            trocarCanal(canalCriado.nome);
+                        }
+                    }
+                }
 
-            mostrarNotificacao(
-                "sucesso",
-                "Canal criado!",
-                `O canal #${nome} foi criado.`
-            );
+                channelModal.classList.remove("show");
+                channelName.value = "";
+
+                mostrarNotificacao(
+                    "sucesso",
+                    "Canal criado!",
+                    `O canal #${canalCriado.nome} foi criado.`
+                );
+            } catch (erro) {
+                mostrarNotificacao(
+                    "erro",
+                    "Erro ao criar canal",
+                    erro.message
+                );
+            } finally {
+                channelCreate.disabled = false;
+            }
 
         }
     );
